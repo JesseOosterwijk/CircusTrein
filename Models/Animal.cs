@@ -18,12 +18,6 @@ namespace Models
             Name = name;
         }
 
-        public List<Animal> AddAnimalToWagonList(Animal currentAnimal, List<Animal> currentAnimalList)
-        {
-            currentAnimalList.Add(currentAnimal);
-            return currentAnimalList;
-        }
-
         public override string ToString()
         {
             return Name;

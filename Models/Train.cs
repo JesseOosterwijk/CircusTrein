@@ -7,35 +7,37 @@ namespace Models
 {
     public class Train
     {
-        public List<Wagon> wagons = new List<Wagon> { new Wagon() };
+        //TODO public list private maken
+        private List<Wagon> Wagons { get; set; } = new List<Wagon> { };
 
-        private void PutAnimalInWagon(Animal newAnimal, Wagon currentWagon)
+        public Train(List<Wagon> wagons)
         {
-            currentWagon.AnimalsInWagon.Add(newAnimal);
-            currentWagon.WagonSize -= (int)newAnimal.AnimalSize;
+            Wagons = wagons;
         }
 
+
+        //TODO: foreach in foreach
         public void DivideAnimalsOverWagons(List<Animal> animalList)
         {
-            foreach (Wagon wagon in wagons.ToList())
+            if (animalList != null)
             {
-                foreach (Animal animal in animalList)
+                foreach (Wagon wagon in Wagons.ToList())
                 {
-                    if (wagon.CheckIfAnimalsAreCompatible(animal, wagon) && wagon.CheckIfRoomForAnimal(animal, wagon))
+                    foreach (Animal animal in animalList)
                     {
-                        PutAnimalInWagon(animal, wagon);
+                        if (wagon.CheckIfAnimalsAreCompatible(animal, wagon) && wagon.CheckIfRoomForAnimal(animal))
+                        {
+                            wagon.PutAnimalInWagon(animal);
+                        }
+                        else
+                        {
+                            Wagon newWagon = new Wagon();
+                            newWagon.PutAnimalInWagon(animal);
+                            Wagons.Add(newWagon);
+                        }
                     }
-                    else
-                    {
-                        Wagon newWagon = new Wagon();
-                        PutAnimalInWagon(animal, newWagon);
-                        wagons.Add(newWagon);
-                    }
-                }               
+                }
             }
         }
-
     }
-
-
 }

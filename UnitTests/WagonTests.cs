@@ -13,7 +13,7 @@ namespace UnitTests
             var newAnimal = new Animal(Animal.Diet.Carnivore, Animal.Size.Large, "foo");
             var newWagon = new Wagon();
 
-            bool output = newWagon.CheckIfRoomForAnimal(newAnimal, newWagon);
+            bool output = newWagon.CheckIfRoomForAnimal(newAnimal);
 
             Assert.AreEqual(output, true);
         }
@@ -22,12 +22,10 @@ namespace UnitTests
         public void CheckIfRoomForAnimal_ReturnsFalse_IfNoRoom()
         {
             var newAnimal = new Animal(Animal.Diet.Carnivore, Animal.Size.Large, "foo");
-            var newWagon = new Wagon
-            {
-                WagonSize = 4
-            };
+            int size = 4;
+            var newWagon = new Wagon(size);
 
-            bool output = newWagon.CheckIfRoomForAnimal(newAnimal, newWagon);
+            bool output = newWagon.CheckIfRoomForAnimal(newAnimal);
 
             Assert.AreEqual(output, false);
         }
@@ -37,11 +35,8 @@ namespace UnitTests
         {
             Animal newAnimal = new Animal(Animal.Diet.Carnivore, Animal.Size.Large, "foo");
             Wagon newWagon = new Wagon();
-            List<Animal> animalInWagon = new List<Animal>
-            {
-                new Animal(Animal.Diet.Herbivore, Animal.Size.Small, "baa")
-            };
-            newWagon.AnimalsInWagon = animalInWagon;
+            Animal animalInWagon = new Animal(Animal.Diet.Herbivore, Animal.Size.Small, "baa");
+            newWagon.PutAnimalInWagon(animalInWagon);
 
             bool output = newWagon.CheckIfAnimalsAreCompatible(newAnimal, newWagon);
 
@@ -53,11 +48,8 @@ namespace UnitTests
         {
             Animal newAnimal = new Animal(Animal.Diet.Carnivore, Animal.Size.Small, "foo");
             Wagon newWagon = new Wagon();
-            List<Animal> animalInWagon = new List<Animal>
-            {
-                new Animal(Animal.Diet.Herbivore, Animal.Size.Large, "baa")
-            };
-            newWagon.AnimalsInWagon = animalInWagon;
+            Animal animalInWagon = new Animal(Animal.Diet.Herbivore, Animal.Size.Large, "baa");
+            newWagon.PutAnimalInWagon(animalInWagon);
 
             bool output = newWagon.CheckIfAnimalsAreCompatible(newAnimal, newWagon);
 
@@ -69,11 +61,8 @@ namespace UnitTests
         {
             Animal newAnimal = new Animal(Animal.Diet.Herbivore, Animal.Size.Small, "foo");
             Wagon newWagon = new Wagon();
-            List<Animal> animalInWagon = new List<Animal>
-            {
-                new Animal(Animal.Diet.Carnivore, Animal.Size.Large, "baa")
-            };
-            newWagon.AnimalsInWagon = animalInWagon;
+            Animal animalInWagon = new Animal(Animal.Diet.Carnivore, Animal.Size.Large, "baa");
+            newWagon.PutAnimalInWagon(animalInWagon);
 
             bool output = newWagon.CheckIfAnimalsAreCompatible(newAnimal, newWagon);
 
@@ -83,29 +72,23 @@ namespace UnitTests
         [TestMethod]
         public void DivideAnimalsOverWagons_DividesAnimals()
         {
-            Train train = new Train();
-            List<Animal> animalList = new List<Animal>();
+            
+            List<Animal> animalList = MakeSixAnimals();
             List<Wagon> wagonList = new List<Wagon>();
             var newAnimal = new Animal(Animal.Diet.Carnivore, Animal.Size.Large, "foo");
             var firstWagon = new Wagon();
 
-            animalList.Add(newAnimal);
-            animalList.Add(newAnimal);
-            animalList.Add(newAnimal);
-            animalList.Add(newAnimal);
-            animalList.Add(newAnimal);
-
             wagonList.Add(firstWagon);
-
+            Train train = new Train(wagonList);
             train.DivideAnimalsOverWagons(animalList);
 
-            Assert.AreEqual(train.wagons.Count, 5);
+            Assert.AreEqual(train.Wagons.Count, 5);
         }
 
         [TestMethod]
-        public void DivideAnimalsOverWagons_DividesAnimalsOverWagon()
+        public void DivideAnimalsOverWagons_DividesAnimalsOverWagons()
         {
-            Train train = new Train();
+
             List<Animal> animalList = new List<Animal>();
             List<Wagon> wagonList = new List<Wagon>();
             var newAnimal = new Animal(Animal.Diet.Herbivore, Animal.Size.Large, "foo");
@@ -116,16 +99,16 @@ namespace UnitTests
             animalList.Add(newAnimal2);
 
             wagonList.Add(firstWagon);
-
+            Train train = new Train(wagonList);
             train.DivideAnimalsOverWagons(animalList);
 
-            Assert.AreEqual(train.wagons.Count, 1);
+            Assert.AreEqual(train.Wagons.Count, 1);
         }
 
         [TestMethod]
         public void DivideAnimalsOverWagons_MakesNewWagon()
         {
-            Train train = new Train();
+
             List<Animal> animalList = new List<Animal>();
             List<Wagon> wagonList = new List<Wagon>();
             var newAnimal = new Animal(Animal.Diet.Carnivore, Animal.Size.Large, "foo");
@@ -136,10 +119,22 @@ namespace UnitTests
             animalList.Add(newAnimal2);
 
             wagonList.Add(firstWagon);
-
+            Train train = new Train(wagonList);
             train.DivideAnimalsOverWagons(animalList);
 
-            Assert.AreEqual(train.wagons.Count, 2);
+            Assert.AreEqual(train.Wagons.Count, 2);
+        }
+
+        public List<Animal> MakeSixAnimals()
+        {
+            List<Animal> animalList = new List<Animal>();
+            var newAnimal = new Animal(Animal.Diet.Carnivore, Animal.Size.Large, "foo");
+            animalList.Add(newAnimal);
+            animalList.Add(newAnimal);
+            animalList.Add(newAnimal);
+            animalList.Add(newAnimal);
+            animalList.Add(newAnimal);
+            return animalList;
         }
     }
 }
