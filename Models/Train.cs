@@ -1,42 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Models
 {
     public class Train
     {
-        //TODO public list private maken
-        private List<Wagon> Wagons { get; set; } = new List<Wagon> { };
 
-        public Train(List<Wagon> wagons)
+        private List<Wagon> Wagons { get; } = new List<Wagon>();
+
+        private readonly List<Animal> animalList;
+        public Train()
         {
-            Wagons = wagons;
         }
 
-
-        //TODO: foreach in foreach
-        public void DivideAnimalsOverWagons(List<Animal> animalList)
+        public void DivideAnimalsOverWagons()
         {
-            if (animalList != null)
+            foreach (Animal animal in animalList)
             {
-                foreach (Wagon wagon in Wagons.ToList())
+                AddAnimalsToWagons(animal);
+            }
+        }
+
+        public void AddAnimalsToWagons(Animal animal)
+        {
+            if (Wagons.Count == 0)
+            {
+                Wagon newWagon = new Wagon();
+                newWagon.AddAnimal(animal);
+                Wagons.Add(newWagon);
+            }
+            else
+            {
+                foreach (Wagon wagon in Wagons)
                 {
-                    foreach (Animal animal in animalList)
-                    {
-                        if (wagon.CheckIfAnimalsAreCompatible(animal, wagon) && wagon.CheckIfRoomForAnimal(animal))
-                        {
-                            wagon.PutAnimalInWagon(animal);
-                        }
-                        else
-                        {
-                            Wagon newWagon = new Wagon();
-                            newWagon.PutAnimalInWagon(animal);
-                            Wagons.Add(newWagon);
-                        }
+                    if (wagon.AddAnimal(animal) == true)
+                    {                        
+                        wagon.AddAnimal(animal);
+                        return;
                     }
                 }
+                Wagon newWagon = new Wagon();
+                Wagons.Add(newWagon);
+                newWagon.AddAnimal(animal);
+                return;
             }
         }
     }

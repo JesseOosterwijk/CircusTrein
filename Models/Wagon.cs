@@ -1,68 +1,57 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Linq;
+﻿using System.Collections.Generic;
 
 namespace Models
 {
     public class Wagon
     {
         public int WagonSize { get; private set; }
-        private List<Animal> AnimalsInWagon { get; set; } = new List<Animal>();
+        private List<Animal> AnimalsInWagon = new List<Animal>();
 
         public Wagon(int wagonSize = 10)
         {
             WagonSize = wagonSize;
         }
 
-        public Wagon(List<Animal> animals, int wagonSize = 10)
-        {
-            WagonSize = wagonSize;
-            AnimalsInWagon = animals;
-        }
-
-        //TODO: Kan aanroepen zonder checks
-        public void PutAnimalInWagon(Animal newAnimal)
+        public bool IsThereRoomForAnimal(Animal newAnimal)
         {
             if ((int)newAnimal.AnimalSize <= WagonSize)
             {
-                AnimalsInWagon.Add(newAnimal);
-                WagonSize -= (int)newAnimal.AnimalSize;
+                return true;
             }
+            return false;
         }
 
-        public bool CheckIfRoomForAnimal(Animal animal)
+        public bool AddAnimal(Animal newAnimal)
         {
-            int animalSize = (int)animal.AnimalSize;
-            if (animalSize > WagonSize)
+            if (AnimalsInWagon.Count == 0)
             {
-                return false;
+                WagonSize -= (int)newAnimal.AnimalSize;
+                AnimalsInWagon.Add(newAnimal);
+                return true;
             }
             else
             {
-                return true;
-            }
-        }
-
-        public bool CheckIfAnimalsAreCompatible(Animal newAnimal, Wagon wagon)
-        {
-            bool CompatibleOrNot = true;
-            foreach (Animal animal in wagon.AnimalsInWagon)
-            {
-                if ((int)animal.AnimalSize >= (int)newAnimal.AnimalSize && animal.AnimalDiet == Animal.Diet.Carnivore)
+                if (IsThereRoomForAnimal(newAnimal))
                 {
-                    CompatibleOrNot = false;
-                }
-                else if ((int)animal.AnimalSize <= (int)newAnimal.AnimalSize && newAnimal.AnimalDiet == Animal.Diet.Carnivore)
-                {
-                    CompatibleOrNot = false;
-                }
-                else
-                {
-                    CompatibleOrNot = true;
+                    foreach (Animal animal in AnimalsInWagon)
+                    {
+                        if ((int)animal.AnimalSize >= (int)newAnimal.AnimalSize && animal.AnimalDiet == Animal.Diet.Carnivore)
+                        {
+                            return false;
+                        }
+                        else if ((int)animal.AnimalSize <= (int)newAnimal.AnimalSize && newAnimal.AnimalDiet == Animal.Diet.Carnivore)
+                        {
+                            return false;
+                        }
+                        else
+                        {
+                            WagonSize -= (int)newAnimal.AnimalSize;
+                            return true;
+                        }
+                    }
                 }
             }
-            return CompatibleOrNot;
+            return false;
         }
 
         public override string ToString()

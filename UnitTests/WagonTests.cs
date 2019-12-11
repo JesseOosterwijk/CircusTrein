@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Models;
-using System.Collections.Generic;
 
 namespace UnitTests
 {
@@ -8,133 +7,350 @@ namespace UnitTests
     public class WagonTests
     {
         [TestMethod]
-        public void CheckIfRoomForAnimal_ReturnsTrue_IfRoom()
+        public void IsThereRoomForAnimal_ReturnsFalse_IfNoRoom()
         {
-            var newAnimal = new Animal(Animal.Diet.Carnivore, Animal.Size.Large, "foo");
-            var newWagon = new Wagon();
+            Wagon wagon = GenerateFullWagon();
+            Animal animal = GenerateLargeHerbivore();
 
-            bool output = newWagon.CheckIfRoomForAnimal(newAnimal);
+            var result = wagon.IsThereRoomForAnimal(animal);
 
-            Assert.AreEqual(output, true);
+            Assert.IsFalse(result);
         }
 
         [TestMethod]
-        public void CheckIfRoomForAnimal_ReturnsFalse_IfNoRoom()
+        public void IsThereRoomForAnimal_ReturnsTrue_IfRoom_EmptyWagon()
         {
-            var newAnimal = new Animal(Animal.Diet.Carnivore, Animal.Size.Large, "foo");
-            int size = 4;
-            var newWagon = new Wagon(size);
+            Wagon wagon = new Wagon();
+            Animal animal = GenerateLargeCarnivore();
 
-            bool output = newWagon.CheckIfRoomForAnimal(newAnimal);
-
-            Assert.AreEqual(output, false);
+            var result = wagon.IsThereRoomForAnimal(animal);
+            Assert.IsTrue(result);
         }
 
         [TestMethod]
-        public void CheckIfAnimalsAreCompatible_ReturnsFalse_IfNotCompatible()
+        public void IsThereRoomForAnimal_ReturnsTrue_IfRoom_HalfFullWagon()
         {
-            Animal newAnimal = new Animal(Animal.Diet.Carnivore, Animal.Size.Large, "foo");
-            Wagon newWagon = new Wagon();
-            Animal animalInWagon = new Animal(Animal.Diet.Herbivore, Animal.Size.Small, "baa");
-            newWagon.PutAnimalInWagon(animalInWagon);
+            Wagon wagon = new Wagon();
+            Animal animal = GenerateLargeCarnivore();
+            wagon.AddAnimal(animal);
 
-            bool output = newWagon.CheckIfAnimalsAreCompatible(newAnimal, newWagon);
+            var result = wagon.IsThereRoomForAnimal(animal);
 
-            Assert.AreEqual(output, false);
+            Assert.IsTrue(result);
         }
 
         [TestMethod]
-        public void CheckIfAnimalsAreCompatible_ReturnsTrue_IfCompatible()
+        public void AddAnimal_ReturnsTrue_IfNoOtherAnimalInWagon()
         {
-            Animal newAnimal = new Animal(Animal.Diet.Carnivore, Animal.Size.Small, "foo");
-            Wagon newWagon = new Wagon();
-            Animal animalInWagon = new Animal(Animal.Diet.Herbivore, Animal.Size.Large, "baa");
-            newWagon.PutAnimalInWagon(animalInWagon);
+            Wagon wagon = new Wagon();
+            Animal newAnimal = GenerateLargeHerbivore();
 
-            bool output = newWagon.CheckIfAnimalsAreCompatible(newAnimal, newWagon);
+            var result = wagon.AddAnimal(newAnimal);
 
-            Assert.AreEqual(output, true);
+            Assert.IsTrue(result);
         }
 
         [TestMethod]
-        public void CheckIfAnimalsAreCompatible_ReturnsFalse_IfNotCompatible2()
+        public void AddAnimal_ReturnsFalse_IfNoRoomForAnimal()
         {
-            Animal newAnimal = new Animal(Animal.Diet.Herbivore, Animal.Size.Small, "foo");
-            Wagon newWagon = new Wagon();
-            Animal animalInWagon = new Animal(Animal.Diet.Carnivore, Animal.Size.Large, "baa");
-            newWagon.PutAnimalInWagon(animalInWagon);
+            Wagon wagon = GenerateFullWagon();
+            Animal newAnimal = GenerateMediumCarnivore();
 
-            bool output = newWagon.CheckIfAnimalsAreCompatible(newAnimal, newWagon);
+            var result = wagon.AddAnimal(newAnimal);
 
-            Assert.AreEqual(output, false);
+            Assert.IsFalse(result);
         }
 
         [TestMethod]
-        public void DivideAnimalsOverWagons_DividesAnimals()
+        public void AddAnimal_ReturnsFalse_LargeCarnivoreGetsAdded_ToSmallHerbivore()
         {
+            Wagon wagon = new Wagon();
+            Animal animalInWagon = GenerateSmallHerbivore();
+            Animal newAnimal = GenerateLargeCarnivore();
+
+            wagon.AddAnimal(animalInWagon);
+
+            var result = wagon.AddAnimal(newAnimal);
+
+            Assert.IsFalse(result);
             
-            List<Animal> animalList = MakeSixAnimals();
-            List<Wagon> wagonList = new List<Wagon>();
-            var newAnimal = new Animal(Animal.Diet.Carnivore, Animal.Size.Large, "foo");
-            var firstWagon = new Wagon();
-
-            wagonList.Add(firstWagon);
-            Train train = new Train(wagonList);
-            train.DivideAnimalsOverWagons(animalList);
-
-            Assert.AreEqual(train.Wagons.Count, 5);
         }
 
         [TestMethod]
-        public void DivideAnimalsOverWagons_DividesAnimalsOverWagons()
+        public void AddAnimal_ReturnsFalse_LargeCarnivoreGetsAdded_ToMediumHerbivore()
         {
+            Wagon wagon = new Wagon();
+            Animal animalInWagon = GenerateMediumHerbivore();
+            Animal newAnimal = GenerateLargeCarnivore();
 
-            List<Animal> animalList = new List<Animal>();
-            List<Wagon> wagonList = new List<Wagon>();
-            var newAnimal = new Animal(Animal.Diet.Herbivore, Animal.Size.Large, "foo");
-            var newAnimal2 = new Animal(Animal.Diet.Herbivore, Animal.Size.Large, "baa");
-            var firstWagon = new Wagon();
+            wagon.AddAnimal(animalInWagon);
 
-            animalList.Add(newAnimal);
-            animalList.Add(newAnimal2);
+            var result = wagon.AddAnimal(newAnimal);
 
-            wagonList.Add(firstWagon);
-            Train train = new Train(wagonList);
-            train.DivideAnimalsOverWagons(animalList);
-
-            Assert.AreEqual(train.Wagons.Count, 1);
+            Assert.IsFalse(result);
         }
 
         [TestMethod]
-        public void DivideAnimalsOverWagons_MakesNewWagon()
+        public void AddAnimal_ReturnsFalse_LargeCarnivoreGetsAdded_ToLargeHerbivore()
         {
+            Wagon wagon = new Wagon();
+            Animal animalInWagon = GenerateLargeHerbivore();
+            Animal newAnimal = GenerateLargeCarnivore();
 
-            List<Animal> animalList = new List<Animal>();
-            List<Wagon> wagonList = new List<Wagon>();
-            var newAnimal = new Animal(Animal.Diet.Carnivore, Animal.Size.Large, "foo");
-            var newAnimal2 = new Animal(Animal.Diet.Herbivore, Animal.Size.Large, "baa");
-            var firstWagon = new Wagon();
+            wagon.AddAnimal(animalInWagon);
 
-            animalList.Add(newAnimal);
-            animalList.Add(newAnimal2);
+            var result = wagon.AddAnimal(newAnimal);
 
-            wagonList.Add(firstWagon);
-            Train train = new Train(wagonList);
-            train.DivideAnimalsOverWagons(animalList);
-
-            Assert.AreEqual(train.Wagons.Count, 2);
+            Assert.IsFalse(result);
         }
 
-        public List<Animal> MakeSixAnimals()
+        [TestMethod]
+        public void AddAnimal_ReturnsTrue_MediumCarnivoreGetsAdded_ToLargeHerbivore()
         {
-            List<Animal> animalList = new List<Animal>();
-            var newAnimal = new Animal(Animal.Diet.Carnivore, Animal.Size.Large, "foo");
-            animalList.Add(newAnimal);
-            animalList.Add(newAnimal);
-            animalList.Add(newAnimal);
-            animalList.Add(newAnimal);
-            animalList.Add(newAnimal);
-            return animalList;
+            Wagon wagon = new Wagon();
+            Animal animalInWagon = GenerateLargeHerbivore();
+            Animal newAnimal = GenerateMediumCarnivore();
+
+            wagon.AddAnimal(animalInWagon);
+
+            var result = wagon.AddAnimal(newAnimal);
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void AddAnimal_ReturnsFalse_MediumCarnivoreGetsAdded_ToMediumHerbivore()
+        {
+            Wagon wagon = new Wagon();
+            Animal animalInWagon = GenerateMediumHerbivore();
+            Animal newAnimal = GenerateMediumCarnivore();
+
+            wagon.AddAnimal(animalInWagon);
+
+            var result = wagon.AddAnimal(newAnimal);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void AddAnimal_ReturnsFalse_MediumCarnivoreGetsAdded_ToSmallHerbivore()
+        {
+            Wagon wagon = new Wagon();
+            Animal animalInWagon = GenerateSmallHerbivore();
+            Animal newAnimal = GenerateMediumCarnivore();
+
+            wagon.AddAnimal(animalInWagon);
+
+            var result = wagon.AddAnimal(newAnimal);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void AddAnimal_ReturnsTrue_SmallCarnivoreGetsAdded_ToLargeHerbivore()
+        {
+            Wagon wagon = new Wagon();
+            Animal animalInWagon = GenerateLargeHerbivore();
+            Animal newAnimal = GenerateSmallCarnivore();
+
+            wagon.AddAnimal(animalInWagon);
+
+            var result = wagon.AddAnimal(newAnimal);
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void AddAnimal_ReturnsTrue_SmallCarnivoreGetsAdded_ToMediumHerbivore()
+        {
+            Wagon wagon = new Wagon();
+            Animal animalInWagon = GenerateMediumHerbivore();
+            Animal newAnimal = GenerateSmallCarnivore();
+
+            wagon.AddAnimal(animalInWagon);
+
+            var result = wagon.AddAnimal(newAnimal);
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void AddAnimal_ReturnsFlase_SmallCarnivoreGetsAdded_ToSmallHerbivore()
+        {
+            Wagon wagon = new Wagon();
+            Animal animalInWagon = GenerateSmallHerbivore();
+            Animal newAnimal = GenerateSmallCarnivore();
+
+            wagon.AddAnimal(animalInWagon);
+
+            var result = wagon.AddAnimal(newAnimal);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void AddAnimal_ReturnsFalse_LargeHerbivoreGetsAdded_ToLargeCarnivore()
+        {
+            Wagon wagon = new Wagon();
+            Animal animalInWagon = GenerateLargeCarnivore();
+            Animal newAnimal = GenerateLargeHerbivore();
+
+            wagon.AddAnimal(animalInWagon);
+
+            var result = wagon.AddAnimal(newAnimal);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void AddAnimal_ReturnsTrue_LargeHerbivoreGetsAdded_ToMediumCarnivore()
+        {
+            Wagon wagon = new Wagon();
+            Animal animalInWagon = GenerateMediumCarnivore();
+            Animal newAnimal = GenerateLargeHerbivore();
+
+            wagon.AddAnimal(animalInWagon);
+
+            var result = wagon.AddAnimal(newAnimal);
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void AddAnimal_ReturnsTrue_LargeHerbivoreGetsAdded_ToSmallCarnivore()
+        {
+            Wagon wagon = new Wagon();
+            Animal animalInWagon = GenerateSmallCarnivore();
+            Animal newAnimal = GenerateLargeHerbivore();
+
+            wagon.AddAnimal(animalInWagon);
+
+            var result = wagon.AddAnimal(newAnimal);
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void AddAnimal_ReturnsFalse_MediumHerbivoreGetsAdded_ToLargeCarnivore()
+        {
+            Wagon wagon = new Wagon();
+            Animal animalInWagon = GenerateLargeCarnivore();
+            Animal newAnimal = GenerateMediumHerbivore();
+
+            wagon.AddAnimal(animalInWagon);
+
+            var result = wagon.AddAnimal(newAnimal);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void AddAnimal_ReturnsFalse_MediumHerbivoreGetsAdded_ToMediumCarnivore()
+        {
+            Wagon wagon = new Wagon();
+            Animal animalInWagon = GenerateMediumCarnivore();
+            Animal newAnimal = GenerateMediumHerbivore();
+
+            wagon.AddAnimal(animalInWagon);
+
+            var result = wagon.AddAnimal(newAnimal);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void AddAnimal_ReturnsTrue_MediumHerbivoreGetsAdded_ToSmallCarnivore()
+        {
+            Wagon wagon = new Wagon();
+            Animal animalInWagon = GenerateSmallCarnivore();
+            Animal newAnimal = GenerateMediumHerbivore();
+
+            wagon.AddAnimal(animalInWagon);
+
+            var result = wagon.AddAnimal(newAnimal);
+
+            Assert.IsTrue(result);
+        }
+
+        [TestMethod]
+        public void AddAnimal_ReturnsFalse_SmallHerbivoreGetsAdded_ToLargeCarnivore()
+        {
+            Wagon wagon = new Wagon();
+            Animal animalInWagon = GenerateLargeCarnivore();
+            Animal newAnimal = GenerateSmallHerbivore();
+
+            wagon.AddAnimal(animalInWagon);
+
+            var result = wagon.AddAnimal(newAnimal);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void AddAnimal_ReturnsFalse_SmallHerbivoreGetsAdded_ToMediumCarnivore()
+        {
+            Wagon wagon = new Wagon();
+            Animal animalInWagon = GenerateMediumCarnivore();
+            Animal newAnimal = GenerateSmallHerbivore();
+
+            wagon.AddAnimal(animalInWagon);
+
+            var result = wagon.AddAnimal(newAnimal);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestMethod]
+        public void AddAnimal_ReturnsFalse_SmallHerbivoreGetsAdded_ToSmallCarnivore()
+        {
+            Wagon wagon = new Wagon();
+            Animal animalInWagon = GenerateSmallCarnivore();
+            Animal newAnimal = GenerateSmallHerbivore();
+
+            wagon.AddAnimal(animalInWagon);
+
+            var result = wagon.AddAnimal(newAnimal);
+
+            Assert.IsFalse(result);
+        }
+
+        Animal GenerateLargeCarnivore()
+        {
+            return new Animal(Animal.Diet.Carnivore, Animal.Size.Large, "Lion");
+        }
+
+        Animal GenerateMediumCarnivore()
+        {
+            return new Animal(Animal.Diet.Carnivore, Animal.Size.Medium, "Hyena");
+        }
+
+        Animal GenerateSmallCarnivore()
+        {
+            return new Animal(Animal.Diet.Carnivore, Animal.Size.Small, "Lizard");
+        }
+
+        Animal GenerateSmallHerbivore()
+        {
+            return new Animal(Animal.Diet.Herbivore, Animal.Size.Small, "Rabbit");
+        }
+
+        Animal GenerateMediumHerbivore()
+        {
+            return new Animal(Animal.Diet.Herbivore, Animal.Size.Medium, "Sheep");
+        }
+
+        Animal GenerateLargeHerbivore()
+        {
+            return new Animal(Animal.Diet.Herbivore, Animal.Size.Large, "Elephant");
+        }
+
+        Wagon GenerateFullWagon()
+        {
+            Wagon wagon = new Wagon();
+            Animal animal = GenerateLargeHerbivore();
+            wagon.AddAnimal(animal);
+            wagon.AddAnimal(animal);
+            return wagon;
         }
     }
 }

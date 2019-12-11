@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Models
+﻿namespace Models
 {
     public class Animal
     {
@@ -20,7 +17,7 @@ namespace Models
 
         public override string ToString()
         {
-            return Name;
+            return Name + ", " + AnimalDiet.ToString() + ", " + AnimalSize.ToString();
         }
     }
 }
