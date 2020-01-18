@@ -46,6 +46,7 @@ namespace Models
                         else
                         {
                             WagonSize -= (int)newAnimal.AnimalSize;
+                            AnimalsInWagon.Add(newAnimal);
                             return true;
                         }
                     }
@@ -56,7 +57,7 @@ namespace Models
 
         public override string ToString()
         {
-            return "Wagon";
+            return $"Wagon, Remaining Size:{WagonSize} Animals in wagon: {AnimalsInWagon}" ;
         }
 
     }

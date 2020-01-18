@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Models;
+using System.Collections.Generic;
 
 namespace UnitTests
 {
@@ -9,7 +10,9 @@ namespace UnitTests
         [TestMethod]
         public void IsThereRoomForAnimal_ReturnsFalse_IfNoRoom()
         {
-            Wagon wagon = GenerateFullWagon();
+            Wagon wagon = new Wagon();
+            wagon.AddAnimal(GenerateLargeHerbivore());
+            wagon.AddAnimal(GenerateLargeHerbivore());
             Animal animal = GenerateLargeHerbivore();
 
             var result = wagon.IsThereRoomForAnimal(animal);
@@ -53,7 +56,9 @@ namespace UnitTests
         [TestMethod]
         public void AddAnimal_ReturnsFalse_IfNoRoomForAnimal()
         {
-            Wagon wagon = GenerateFullWagon();
+            Wagon wagon = new Wagon();
+            wagon.AddAnimal(GenerateLargeHerbivore());
+            wagon.AddAnimal(GenerateLargeHerbivore());
             Animal newAnimal = GenerateMediumCarnivore();
 
             var result = wagon.AddAnimal(newAnimal);
@@ -73,7 +78,7 @@ namespace UnitTests
             var result = wagon.AddAnimal(newAnimal);
 
             Assert.IsFalse(result);
-            
+
         }
 
         [TestMethod]
@@ -314,6 +319,124 @@ namespace UnitTests
             Assert.IsFalse(result);
         }
 
+        [TestMethod]
+        public void DivideAnimalsToWagons_Test1()
+        {
+            Train train = new Train();
+            List<Animal> animalList = new List<Animal>();
+            List<Wagon> wagonList = new List<Wagon>();
+            for (int i = 0; i < 5; i++)
+            {
+                animalList.Add(GenerateSmallCarnivore());
+                animalList.Add(GenerateMediumCarnivore());
+                animalList.Add(GenerateLargeCarnivore());
+                animalList.Add(GenerateSmallHerbivore());
+                animalList.Add(GenerateMediumHerbivore());
+                animalList.Add(GenerateLargeHerbivore());
+            }
+
+            train.DivideAnimalsOverWagons(animalList, wagonList);
+
+            Assert.AreEqual(train.AnimalsInWagons, animalList.Count);
+            Assert.AreEqual(17, wagonList.Count);
+        }
+
+        [TestMethod]
+        public void DivideAnimalsToWagons_Test2()
+        {
+            Train train = new Train();
+            List<Animal> animalList = new List<Animal>();
+            List<Wagon> wagonList = new List<Wagon>();
+            for (int i = 0; i < 8; i++)
+            {
+                animalList.Add(GenerateSmallHerbivore());
+                animalList.Add(GenerateMediumHerbivore());
+                animalList.Add(GenerateLargeHerbivore());
+                animalList.Add(GenerateSmallCarnivore());
+                animalList.Add(GenerateMediumCarnivore());
+                animalList.Add(GenerateLargeCarnivore());
+            }
+
+            train.DivideAnimalsOverWagons(animalList, wagonList);
+
+            Assert.AreEqual(train.AnimalsInWagons, animalList.Count);
+            Assert.AreEqual(27, wagonList.Count);
+        }
+
+        [TestMethod]
+        public void DivideAnimalsToWagons_Test3()
+        {
+            Train train = new Train();
+            List<Animal> animalList = new List<Animal>();
+            List<Wagon> wagonList = new List<Wagon>();
+            for (int i = 0; i < 8; i++)
+            {
+                animalList.Add(GenerateSmallHerbivore());
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                animalList.Add(GenerateMediumHerbivore());
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                animalList.Add(GenerateLargeHerbivore());
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                animalList.Add(GenerateSmallCarnivore());
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                animalList.Add(GenerateMediumCarnivore());
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                animalList.Add(GenerateLargeCarnivore());
+            }
+
+
+            train.DivideAnimalsOverWagons(animalList, wagonList);
+
+            Assert.AreEqual(train.AnimalsInWagons, animalList.Count);
+            Assert.AreEqual(26, wagonList.Count);
+        }
+
+        [TestMethod]
+        public void DivideAnimalsToWagons_Test4()
+        {
+            Train train = new Train();
+            List<Animal> animalList = new List<Animal>();
+            List<Wagon> wagonList = new List<Wagon>();
+            for (int i = 0; i < 8; i++)
+            {
+                animalList.Add(GenerateLargeCarnivore());
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                animalList.Add(GenerateMediumCarnivore());
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                animalList.Add(GenerateSmallCarnivore());
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                animalList.Add(GenerateSmallHerbivore());
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                animalList.Add(GenerateMediumHerbivore());
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                animalList.Add(GenerateLargeHerbivore());
+            }
+            train.DivideAnimalsOverWagons(animalList, wagonList);
+
+            Assert.AreEqual(train.AnimalsInWagons, animalList.Count);
+            Assert.AreEqual(25, wagonList.Count);
+        }
+
         Animal GenerateLargeCarnivore()
         {
             return new Animal(Animal.Diet.Carnivore, Animal.Size.Large, "Lion");
@@ -344,13 +467,5 @@ namespace UnitTests
             return new Animal(Animal.Diet.Herbivore, Animal.Size.Large, "Elephant");
         }
 
-        Wagon GenerateFullWagon()
-        {
-            Wagon wagon = new Wagon();
-            Animal animal = GenerateLargeHerbivore();
-            wagon.AddAnimal(animal);
-            wagon.AddAnimal(animal);
-            return wagon;
-        }
     }
 }
